@@ -30,32 +30,61 @@ def evaluate_expression(expression: str) -> int:
     """
     operators = []
     operands = []
-    
-    def push_operator(op: str):
-        """Push an operator onto the operator stack."""
-    
-    def push_operand(val: int):
-        """Push an operand onto the operand stack."""
-    
-    def pop_operator() -> str:
-        """Pop and return the top operator from the operator stack."""
-    
-    def pop_operand() -> int:
-        """Pop and return the top operand from the operand stack."""
-    
-    def apply_operator(op: str, val1: int, val2: int) -> int:
-        """
-        Applies an operator to two operands.
 
-        :param op: str - The operator ('+', '-', '*', '/').
-        :param val1: int - The first operand.
-        :param val2: int - The second operand.
-        :return: int - The result of applying the operator.
-        """
-    
-    """
-    Evaluate the expression one character at a time, the operand stack
-    will contain the final result at the end
-    """
-    
-    return pop_operand()
+    def apply_operator():
+        """Applies the top operator on the top two operands and pushes the result back."""
+        if len(operands) < 2 or not operators:
+            return
+        val2 = operands.pop()
+        val1 = operands.pop()
+        op = operators.pop()
+        
+        if op == '+':
+            operands.append(val1 + val2)
+        elif op == '-':
+            operands.append(val1 - val2)
+        elif op == '*':
+            operands.append(val1 * val2)
+        elif op == '/':
+            operands.append(val1 // val2)  
+
+    i=0
+    while i < len(expression):
+        char = expression[i]
+
+        if char == ' ':
+            i += 1
+            continue
+
+        if char.isdigit():  
+            num = 0
+            while i < len(expression) and expression[i].isdigit():
+                num = num * 10 + int(expression[i])
+                i += 1
+            operands.append(num)
+            continue
+
+        elif char in "+-*/":
+            while (operators and operators[-1] in "+-*/" and char in "+-*/"):
+                apply_operator()
+            operators.append(char)
+
+        elif char == '(':
+            operators.append(char)
+
+        elif char == ')':
+            while operators and operators[-1] != '(':
+                apply_operator()
+            operators.pop()  
+
+        i += 1
+
+    while operators:
+        apply_operator()
+
+    return operands.pop() if operands else 0
+
+
+expression = "((3 + 2) * 5)"
+result = evaluate_expression(expression)
+print(f"Result: {result}")  
